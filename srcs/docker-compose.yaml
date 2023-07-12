@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  nginx:
+    build:
+      context: ./requirements/nginx
+    volumes:
+      - wordpress:/var/www/html
+    ports:
+      - '443:443'
+    restart: always
+
+  mariadb:
+    build:
+      context: ./requirements/mariadb
+    volumes:
+      - data:/var/lib/mysql
+    restart: always
+
+  wordpress:
+    build:
+      context: ./requirements/wordpress
+    volumes:
+      - wordpress:/var/www/html
+    restart: always
+
+
+volumes:
+  data:
+  wordpress:
+
+networks:
+  default:
+    name: bridg
+
