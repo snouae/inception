@@ -16,11 +16,11 @@ mysql -e "FLUSH PRIVILEGES;"
 mysql -e "alter user 'root'@'localhost' identified by '$DB_PASS';" ;
 mysql -e "FLUSH PRIVILEGES;"
 
-echo "MySQL database, user, and privileges have been set up successfully."
+# echo "MySQL database, user, and privileges have been set up successfully."
 
 kill `cat /var/run/mysqld/mysqld.pid`
 # service -u root -p${DB_PASS} mysql stop
 
 #mysqladmin -u root -p"$DB_PASS" shutdown
 
-exec "$@"
+exec "$@" 

@@ -1,7 +1,10 @@
 version: '3'
+    # Persistent volume for storing WordPress data
 
 services:
   nginx:
+    depends_on:
+      - wordpress
     build:
       context: ./requirements/nginx
     volumes:
@@ -9,27 +12,69 @@ services:
     ports:
       - '443:443'
     restart: always
+    env_file:
+      - .env
+    # Defines a service named nginx that will be built using the Dockerfile located in the ./requirements/nginx directory.
+    # Mounts the wordpress volume to the /var/www/html directory within the nginx container, allowing it to access WordPress files.
+    # Publishes the ports 443:443, allowing external access to the Nginx service over HTTPS.
+    # Sets the restart policy to always, ensuring that the container automatically restarts if it stops or crashes.
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
+    # Defines a service named adminer that uses the adminer image from Docker Hub.
+    # Sets the restart policy to always.
+    # Publishes the ports 8080:8080, making the Adminer web interface accessible externally at http://localhost:8080.
 
   mariadb:
     build:
       context: ./requirements/mariadb
     volumes:
-      - data:/var/lib/mysql
+      - mariadb:/var/lib/mysql
+    ports:
+      - '3306:3306'
     restart: always
+    env_file:
+      - .env
+    # Defines a service named mariadb that will be built using the Dockerfile located in the ./requirements/mariadb directory.
+    # Mounts the data volume to the /var/lib/mysql directory within the mariadb container, allowing it to store MariaDB data.
+    # Sets the restart policy to always.
 
   wordpress:
     build:
       context: ./requirements/wordpress
+    depends_on:
+      - mariadb
+
     volumes:
       - wordpress:/var/www/html
     restart: always
-
+    env_file:
+      - .env
+    ports:
+      - '9000:9000'
+    # Defines a service named wordpress that will be built using the Dockerfile located in the ./requirements/wordpress directory.
+    # Mounts the wordpress volume to the /var/www/html directory within the wordpress container, allowing it to store WordPress files.
+    # Sets the restart policy to always.
 
 volumes:
-  data:
   wordpress:
+        name: wordpress
+        driver: local
+        driver_opts:
+            device: /Users/snouae/Desktop/wordpress
+            o: bind
+            type: none 
+  mariadb:
+        name: mariadb
+        driver: local
+        driver_opts:
+            device: /Users/snouae/Desktop/mariadb
+            o: bind
+            type: none 
 
-networks:
-  default:
-    name: bridg
 
