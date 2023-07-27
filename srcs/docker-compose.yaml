@@ -3,55 +3,87 @@ version: '3'
 
 services:
   nginx:
+    container_name: nginx
     depends_on:
       - wordpress
     build:
       context: ./requirements/nginx
     volumes:
       - wordpress:/var/www/html
+    networks:
+      - inception
     ports:
       - '443:443'
     restart: always
     env_file:
       - .env
+
+
+
+  #     docker run -d \
+  # --name nginx \
+  # --depends-on wordpress \
+  # -v wordpress:/var/www/html \
+  # --network inception \
+  # -p 444:443 \
+  # --restart always \
+  # --env-file .env \
+  # ./requirements/nginx
+
     # Defines a service named nginx that will be built using the Dockerfile located in the ./requirements/nginx directory.
     # Mounts the wordpress volume to the /var/www/html directory within the nginx container, allowing it to access WordPress files.
     # Publishes the ports 443:443, allowing external access to the Nginx service over HTTPS.
     # Sets the restart policy to always, ensuring that the container automatically restarts if it stops or crashes.
 
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-    env_file:
-      - .env
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+  #   env_file:
+  #     - .env
     # Defines a service named adminer that uses the adminer image from Docker Hub.
     # Sets the restart policy to always.
     # Publishes the ports 8080:8080, making the Adminer web interface accessible externally at http://localhost:8080.
 
   mariadb:
+    container_name: mariadb
     build:
       context: ./requirements/mariadb
     volumes:
       - mariadb:/var/lib/mysql
+    networks:
+      - inception
     ports:
       - '3306:3306'
     restart: always
     env_file:
       - .env
+
+
+  #     docker run -d \
+  # --name mariadb \
+  # -v mariadb:/var/lib/mysql \
+  # --network inception \
+  # -p 3306:3306 \
+  # --restart always \
+  # --env-file .env \
+  # ./requirements/mariadb
+
     # Defines a service named mariadb that will be built using the Dockerfile located in the ./requirements/mariadb directory.
     # Mounts the data volume to the /var/lib/mysql directory within the mariadb container, allowing it to store MariaDB data.
     # Sets the restart policy to always.
 
   wordpress:
+    container_name: wordpress
     build:
       context: ./requirements/wordpress
     depends_on:
       - mariadb
-
     volumes:
       - wordpress:/var/www/html
+    networks:
+      - inception
     restart: always
     env_file:
       - .env
@@ -63,18 +95,20 @@ services:
 
 volumes:
   wordpress:
-        name: wordpress
         driver: local
         driver_opts:
             device: /Users/snouae/Desktop/wordpress
             o: bind
             type: none 
   mariadb:
-        name: mariadb
         driver: local
         driver_opts:
             device: /Users/snouae/Desktop/mariadb
             o: bind
             type: none 
 
+
+networks:
+  inception:
+    name: inception
 

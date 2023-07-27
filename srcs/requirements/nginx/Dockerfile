@@ -11,7 +11,7 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private
 COPY conf/nginx.conf /etc/nginx/
 
 # Expose port 80 for HTTP traffic and port 443 for HTTPS traffic
-EXPOSE  443
+# EXPOSE  443
 
 # Start Nginx when the container starts
 CMD ["nginx", "-g", "daemon off;"]
